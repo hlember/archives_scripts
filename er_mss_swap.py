@@ -14,7 +14,7 @@ def er_mss_swap(xml_file, new_file):
 
     # Iterate over the <unitid> tags and swap them if they are consecutive
     for atr in range(len(unitids) - 1):
-        if (unitids[atr]['type'] == 'local_mss' and unitids[i + 1]['type'] == 'local_mss_er'):
+        if (unitids[atr]['type'] == 'local_mss' and unitids[atr + 1]['type'] == 'local_mss_er'):
             # Swap the tags in the original XML content
             unitids[atr].insert_before(unitids[atr + 1])
             unitids[atr + 1].insert_after(unitids[atr])
