@@ -12,13 +12,27 @@ def format_extent(file_size_bytes, file_count):
         return None
 
     size = float(file_size_bytes)
-    units = ['bytes', 'kilobytes', 'megabytes', 'gigabytes', 'terabytes']
-    i = 0
-    while size >= 1024 and i < len(units) - 1:
-        size /= 1024
-        i += 1
+    orders = {
+        1.0: 'bytes',
+        1000.0: 'kilobytes',
+        1000000.0: 'megabytes',
+        1000000000.0: 'gigabytes',
+        1000000000000.0: 'terabytes'
+    }
+    magnitudes = sorted(orders.keys(), reverse=True)
+    magnitude = 1.0  # Default to bytes
 
-    return f"{size:.1f} {units[i]} ({file_count} computer files)"
+    for mag in magnitudes:
+        if size >= mag:
+            magnitude = mag
+            break
+
+    return {
+        'number': f"{size / magnitude:.1f}",
+        'extent_type': orders[magnitude],
+        'container_summary': f"{file_count} computer files",
+        'portion': 'whole'
+    }
 
 def flatten_json(json_obj, parent_title="", flattened_list=[]):
     for child in json_obj.get('children', []):
