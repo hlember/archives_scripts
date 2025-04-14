@@ -1,6 +1,6 @@
 """script to transform a JSON export from FTK to csv for import into ArchivesSpace"""
 """run program in the command line"""
-"""python3 input.json output.csv, replace with actual file names"""
+"""python3 er_json_to_csv.py input.json output.csv, replace with actual file names"""
 
 import json
 import csv
