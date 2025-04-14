@@ -27,12 +27,11 @@ def format_extent(file_size_bytes, file_count):
             magnitude = mag
             break
 
-    return {
-        'number': f"{size / magnitude:.1f}",
-        'extent_type': orders[magnitude],
-        'container_summary': f"{file_count} computer files",
-        'portion': 'whole'
-    }
+    number = f"{size / magnitude:.1f}"
+    extent_type = orders[magnitude]
+    container_summary = f"{file_count} computer files"
+
+    return f"{number} {extent_type} ({container_summary})"
 
 def flatten_json(json_obj, parent_title="", flattened_list=[]):
     for child in json_obj.get('children', []):
