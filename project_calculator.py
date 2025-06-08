@@ -1,5 +1,5 @@
 """ takes user input of:
-    a start datw
+    a start date
     total number of days 
  calculates the end date 
   skips holidays and weekends"""

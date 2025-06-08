@@ -20,9 +20,9 @@ def is_holiday(date_obj, holiday_calendar):
     return date_obj in holiday_calendar
 
 def parse_working_days(working_days_str):
-    """Convert 'Mon,Wed,Fri' to [0,2,4]"""
+    """Convert 'Monday,Wednesday,Friday' to [0,2,4]"""
     days_map = {
-        'Mon': 0, 'Tue': 1, 'Wed': 2, 'Thu': 3, 'Fri': 4, 'Sat': 5, 'Sun': 6
+        'Monday': 0, 'Tuesday': 1, 'Wednesday': 2, 'Thursday': 3, 'Friday': 4, 'Saturday': 5, 'Sunday': 6
     }
     days = [days_map.get(day.strip().title()) for day in working_days_str.split(',')]
     if None in days:
@@ -113,10 +113,10 @@ def run_interactive():
 
     if days_per_week == 5:
         allowed_weekdays = [0, 1, 2, 3, 4]
-        working_days_input = "Mon,Tue,Wed,Thu,Fri"
+        working_days_input = "Monday,Tuesday,Wednesday,Thursday,Friday"
     else:
         while True:
-            working_days_input = input(f"Enter the {days_per_week} weekday(s) (e.g., Mon,Wed,Fri): ")
+            working_days_input = input(f"Enter the {days_per_week} weekday(s) (e.g., Monday,Wednesday,Friday): ")
             try:
                 allowed_weekdays = parse_working_days(working_days_input)
                 if len(allowed_weekdays) != days_per_week:
@@ -127,7 +127,7 @@ def run_interactive():
                 print(f"Error: {e}")
 
     duration = calculate_custom_working_days(start_date, end_date, allowed_weekdays, us_holidays)
-    print(f"\n✅ Working days between {start_date_str} and {end_date_str} on {working_days_input}: {duration}")
+    print(f"\n Working days between {start_date_str} and {end_date_str} on {working_days_input}: {duration}")
 
 def run_cli(args):
     start_date_str = args.start_date
@@ -146,7 +146,7 @@ def run_cli(args):
 
     if days_per_week == 5:
         allowed_weekdays = [0, 1, 2, 3, 4]
-        working_days_input = "Mon,Tue,Wed,Thu,Fri"
+        working_days_input = "Monday,Tuesday,Wednesday,Thursday,Friday"
     else:
         if not working_days_input:
             print("Error: Must provide working days when days_per_week < 5.")
@@ -161,14 +161,14 @@ def run_cli(args):
             sys.exit(1)
 
     duration = calculate_custom_working_days(start_date, end_date, allowed_weekdays, us_holidays)
-    print(f"\n✅ Working days between {start_date_str} and {end_date_str} on {working_days_input}: {duration}")
+    print(f"\n Working days between {start_date_str} and {end_date_str} on {working_days_input}: {duration}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Calculate project duration skipping weekends and holidays.")
-    parser.add_argument("start_date", nargs='?', help="Start date (MM/DD/YY)")
-    parser.add_argument("end_date", nargs='?', help="End date (MM/DD/YY)")
+    parser.add_argument("start_date", nargs='?', help="Start date (M/D/YY)")
+    parser.add_argument("end_date", nargs='?', help="End date (M/D/YY)")
     parser.add_argument("days_per_week", type=int, nargs='?', help="Number of days per week the project runs (1–5)")
-    parser.add_argument("working_days", nargs='?', help="Comma-separated list of days (e.g., Mon,Wed,Fri) if < 5 days/week")
+    parser.add_argument("working_days", nargs='?', help="Comma-separated list of days (e.g., Monday,Wednesay,Friday) if < 5 days/week")
 
     args = parser.parse_args()
 

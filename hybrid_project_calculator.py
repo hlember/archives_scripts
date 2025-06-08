@@ -24,18 +24,13 @@ def is_holiday(date_obj, holiday_calendar):
     return date_obj in holiday_calendar
 
 def get_working_days_input(days_per_week_expected):
-    """
-    Prompts the user to specify working days (e.g., Mon, Tue).
-    Returns a list of integer weekdays (0=Monday, 6=Sunday).
-    Ensures the number of selected days matches days_per_week_expected.
-    """
     day_names_map = {
-        'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4,
-        'sat': 5, 'sun': 6
+        'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3, 'friday': 4,
+        'saturday': 5, 'sunday': 6
     }
     
     while True:
-        days_input = input(f"Enter the {days_per_week_expected} working days of the week (e.g., Mon,Tue,Wed,Thu,Fri or 0,1,2,3,4 for Monday-Friday): ").strip()
+        days_input = input(f"Enter the {days_per_week_expected} working days of the week (e.g., Monday,Tuesday,Wednesday,Thursday,Friday or 0,1,2,3,4 for Monday-Friday): ").strip()
         valid_days = []
         parts = [part.strip().lower() for part in days_input.split(',')]
 
@@ -56,7 +51,7 @@ def get_working_days_input(days_per_week_expected):
                     break
                 valid_days.append(day_names_map[part])
             else:
-                print(f"Invalid day '{part}'. Please use full day names (e.g., Mon) or numbers (0-4 for weekdays).")
+                print(f"Invalid day '{part}'. Please use full day names (e.g., Monday) or numbers (0-4 for weekdays).")
                 all_valid = False
                 break
         
@@ -139,7 +134,7 @@ if __name__ == "__main__":
     parser.add_argument("start_date", type=str, nargs='?', help="Start date in MM/DD/YY (e.g., 06/05/25)")
     parser.add_argument("duration", type=int, nargs='?', help="Total duration in working days")
     parser.add_argument("days_per_week", type=int, nargs='?', help="Number of days worked per week (1-5)")
-    parser.add_argument("--working_days", type=str, help="Comma-separated list of working days (e.g., Mon,Tue,Wed or 0,1,2). Only applies if days_per_week < 5.")
+    parser.add_argument("--working_days", type=str, help="Comma-separated list of working days (e.g., Monday,Tuesday,Wednesday or 0,1,2). Only applies if days_per_week < 5.")
 
     args = parser.parse_args()
 
@@ -156,13 +151,13 @@ if __name__ == "__main__":
         specified_working_days = None
         if days_per_week < 5:
             if not args.working_days:
-                print("Error: For days per week less than 5, you must specify working days using --working_days (e.g., --working_days Mon,Tue,Wed).")
+                print("Error: For days per week less than 5, you must specify working days using --working_days (e.g., --working_days Monday,Tuesday,Wednesday).")
                 sys.exit(1)
             
 
             day_names_map = {
-                'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4,
-                'sat': 5, 'sun': 6
+                'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3, 'friday': 4,
+                'saturday': 5, 'sunday': 6
             }
             parsed_days = []
             for day_part in args.working_days.split(','):
