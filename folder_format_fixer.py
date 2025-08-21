@@ -5,10 +5,10 @@ from bs4 import BeautifulSoup
 import re
 
 def fix_folder_ranges(xml_content):
-    soup = BeautifulSoup(xml_content, "xml")
+    soup = BeautifulSoup(xml_content, 'xml')
 
     # Find all container elements with type="folder"
-    for container in soup.find_all("container", {"type": "folder"}):
+    for container in soup.find_all('container', {'type': 'folder'}):
         if container.string:
             original_text = container.string
             # Replace patterns like "1 - 2" with "1-2"
@@ -19,15 +19,15 @@ def fix_folder_ranges(xml_content):
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Fix folder number ranges in XML")
-    parser.add_argument("input", help="Input XML file")
-    parser.add_argument("output", help="Output XML file")
+    parser = argparse.ArgumentParser(description='Fix folder number ranges in XML')
+    parser.add_argument('input', help='Input XML file')
+    parser.add_argument('output', help='Output XML file')
     args = parser.parse_args()
 
-    with open(args.input, "r", encoding="utf-8") as f:
+    with open(args.input, 'r', encoding='utf-8') as f:
         xml_content = f.read()
 
     updated_xml = fix_folder_ranges(xml_content)
 
-    with open(args.output, "w", encoding="utf-8") as f:
+    with open(args.output, 'w', encoding='utf-8') as f:
         f.write(updated_xml)
