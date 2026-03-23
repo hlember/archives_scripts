@@ -17,21 +17,21 @@ Also take user input on process/accessiong rates (hardcoded but can be revised)
   - total staff working on project (can enter part time, e.g. 0.5)
 
 Takes user input for timelines
-  - days per week that project occurs
+  - days per week that project occurs, defaults to 5 days
   - start date (YYYY-MM-DD). Defaults to today 
 
-
-To run enter in commandline: python3 ap_project_planner_ui.py 
+To run enter in command line: python3 ap_project_planner_ui.py 
 
 """
 import datetime
 import holidays
 import math
 
-def get_calendar_stats(total_working_days, staff_count, days_per_week):
-    """Calculates year/month/day breakdown based on project schedule."""
+def get_calendar_stats(total_working_days, staff_count, work_days_indices):
+    """Calculates year/month/day breakdown based on the specific work schedule."""
+    days_per_week = len(work_days_indices)
     days_in_year = 52 * days_per_week
-    days_in_month = days_in_year / 12
+    days_in_month = days_in_year / 12 if days_in_year > 0 else 0
 
     def breakdown(days):
         if days_in_year == 0: return 0, 0, 0
@@ -42,24 +42,45 @@ def get_calendar_stats(total_working_days, staff_count, days_per_week):
         return years, months, remaining_days
 
     total_stats = breakdown(total_working_days)
-    days_per_person = total_working_days / staff_count
+    days_per_person = total_working_days / staff_count if staff_count > 0 else 0
     per_person_stats = breakdown(days_per_person)
 
     return total_stats, per_person_stats, days_per_person
 
-def get_completion_date(start_date, working_days, days_per_week):
-    """Steps through calendar skipping weekends, holidays, and non-work days."""
+def get_completion_date(start_date, working_days, work_days_indices):
+    """Steps through calendar, only counting scheduled workdays."""
     us_holidays = holidays.US()
     current_date = start_date
     days_added = 0
     target_days = math.ceil(working_days)
 
+    if start_date.weekday() in work_days_indices and start_date not in us_holidays:
+        days_added = 1
+
     while days_added < target_days:
         current_date += datetime.timedelta(days=1)
-        if current_date.weekday() >= 5 or current_date in us_holidays or current_date.weekday() >= days_per_week:
-            continue
-        days_added += 1
+        if current_date.weekday() in work_days_indices and current_date not in us_holidays:
+            days_added += 1
+            
     return current_date
+
+def get_work_days_input():
+    """Allows user to select specific work days."""
+    days_map = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    print("\nWhich days of the week will work occur?")
+    for i, day in enumerate(days_map, 1):
+        print(f"  {i}. {day}")
+    
+    user_input = input("Enter numbers (e.g., 1,3,5) or press Enter for Mon-Fri: ").strip()
+    if not user_input:
+        return [0, 1, 2, 3, 4]
+    
+    try:
+        selected = [int(x.strip()) - 1 for x in user_input.split(",") if x.strip().isdigit()]
+        selected = [x for x in selected if 0 <= x <= 4]
+        return sorted(list(set(selected))) if selected else [0, 1, 2, 3, 4]
+    except ValueError:
+        return [0, 1, 2, 3, 4]
 
 def get_numeric_input(prompt, default_val):
     """Shows the default value in the prompt and uses it if input is empty."""
@@ -76,9 +97,10 @@ def get_numeric_input(prompt, default_val):
         except ValueError:
             print("  ! Invalid input. Please enter a number.")
 
-def get_valid_date_input(prompt, dpw):
-    """Rejects weekends/holidays and keeps the prompt clean."""
+def get_valid_date_input(prompt, work_days_indices):
+    """Ensures start date isn't a weekend or holiday."""
     us_holidays = holidays.US()
+    days_map = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     while True:
         start_str = input(f"{prompt} (YYYY-MM-DD) or press Enter for Today: ").strip()
         if not start_str:
@@ -90,16 +112,17 @@ def get_valid_date_input(prompt, dpw):
                 print("  ! Invalid format. Please use YYYY-MM-DD.")
                 continue
         
-        if target_date.weekday() >= 5:
-            print(f"  ! {target_date.strftime('%A')} is a weekend. Projects must start on a workday.")
+        if target_date.weekday() not in work_days_indices:
+            day_name = days_map[target_date.weekday()]
+            print(f"  ! {day_name} is not one of your scheduled work days.")
         elif target_date in us_holidays:
             print(f"  ! {target_date} is a holiday. Please choose a different start date.")
-        elif target_date.weekday() >= dpw:
-            print(f"  ! This falls outside your {dpw}-day work week. Please choose a workday.")
         else:
             return target_date
 
 def main_interactive():
+    HOURS_PER_DAY = 7.0  # Hardcoded hours, but can be revised
+
     while True:
         print("\n" + "="*55)
         print("      ARCHIVAL PROJECT PLANNER")
@@ -107,26 +130,24 @@ def main_interactive():
         print("Press Enter to accept the (Default) values.\n")
 
         # 1. Quantities
-        print("--- STEP 1: WHAT ARE YOU PROCESSING? ---")
+        print("--- STEP 1: COLLECTION EXTENT ---")
         lin = get_numeric_input("Linear feet of physical records", 0)
         ami = get_numeric_input("Number of AMI recordings", 0)
         car = get_numeric_input("Number of digital carriers", 0)
         gb  = get_numeric_input("Gigabytes of digital files", 0)
 
         # 2. Custom Rates
-        print("\n--- STEP 2: HOW FAST IS THE WORK? ---")
+        print("\n--- STEP 2: PROCESSING RATES ---")
         r_lin = get_numeric_input("Linear feet processed per day", 1.0) if lin > 0 else 1.0
         r_ami = get_numeric_input("AMI recordings processed per day", 30.0) if ami > 0 else 30.0
         r_car = get_numeric_input("Days to process 1 digital carrier", 5.0) if car > 0 else 5.0
         r_gb  = get_numeric_input("Days to process 1 Gigabyte", 10.0) if gb > 0 else 10.0
 
         # 3. Project Settings
-        print("\n--- STEP 3: PROJECT DETAILS ---")
+        print("\n--- STEP 3: WORK DAYS AND STAFFING ---")
         staff = get_numeric_input("Number of staff members (FTE)", 1.0)
-        dpw   = get_numeric_input("Work days per week (1-5)", 5.0)
-        if dpw > 5: dpw = 5.0
-        
-        start_date = get_valid_date_input("Start date", dpw)
+        work_days_indices = get_work_days_input()
+        start_date = get_valid_date_input("Start date", work_days_indices)
 
         # 4. Verification Step
         print("\n" + "-"*35)
@@ -135,7 +156,11 @@ def main_interactive():
         if ami > 0: print(f" - AMI: {ami} recs at {r_ami} rec/day")
         if car > 0: print(f" - Carriers: {car} at {r_car} days each")
         if gb  > 0: print(f" - Digital: {gb} GB at {r_gb} days/GB")
-        print(f" - Team: {staff} staff working {dpw} days/week")
+        
+        day_names = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+        selected_days = [day_names[i] for i in work_days_indices]
+        sched_str = ", ".join(selected_days)
+        print(f" - Team: {staff} staff working {HOURS_PER_DAY} hrs/day on: {sched_str}")
         print(f" - Start Date: {start_date.strftime('%A, %B %d, %Y')}")
         print("-" * 35)
         
@@ -152,17 +177,22 @@ def main_interactive():
 
     if total_days == 0:
         print("\nNo workload entered. Calculation cancelled.")
-        input("\nPress Enter to exit...")
         return
 
-    total_stats, pp_stats, calendar_days = get_calendar_stats(total_days, staff, dpw)
-    end_date = get_completion_date(start_date, calendar_days, dpw)
+    total_stats, pp_stats, calendar_days = get_calendar_stats(total_days, staff, work_days_indices)
+    end_date = get_completion_date(start_date, calendar_days, work_days_indices)
+    
+    # Staff Hour Calculation
+    total_hours = total_days * HOURS_PER_DAY
 
-    # Final Report with Rate Summary
+    # Final Report
     print("\n" + "="*55)
     print(f"ESTIMATED COMPLETION: {end_date.strftime('%A, %B %d, %Y')}")
     print("-" * 55)
+    print(f"Team Size:         {staff} Staff (FTE)")
+    print(f"Schedule:          {sched_str} ({len(work_days_indices)} days/week at {HOURS_PER_DAY} hrs/day)")
     print(f"Total Effort:      {round(total_days, 2)} Working Days")
+    print(f"Total Staff Hours: {round(total_hours, 1)} Hours")
     print(f"Calendar Duration: {pp_stats[0]} Years, {pp_stats[1]} Months, {round(pp_stats[2], 1)} Days")
     print("-" * 55)
     print("RATES USED FOR CALCULATION:")
