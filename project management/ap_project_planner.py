@@ -9,9 +9,9 @@ options:
   --car CAR      Number of digital carriers
   --gb GB        Gigabytes of digital files
   --r_lin R_LIN  Rate: Days per linear foot (Default: 1)
-  --r_ami R_AMI  Rate: Recordings processed per 1 day (Default: 30)
-  --r_car R_CAR  Rate: Days per digital carrier (Default: 5)
-  --r_gb R_GB    Rate: Days per Gigabyte (Default: 10)
+  --r_ami R_AMI  Rate: Recordings processed per day (Default: 30)
+  --r_car R_CAR  Rate: Digital carriers per day (Default: 1)
+  --r_gb R_GB    Rate: Days per Gigabyte (Default: 5)
   --staff STAFF  Number of archivists (FTE)
   --dpw DPW      Days per week project occurs (1-5)
   --start START  Start date (YYYY-MM-DD). Defaults to today
@@ -77,8 +77,8 @@ def main():
     # Rates
     parser.add_argument("--r_lin", type=float, default=1.0, help="Rate: Days per linear foot")
     parser.add_argument("--r_ami", type=float, default=30.0, help="Rate: AMI per day")
-    parser.add_argument("--r_car", type=float, default=5.0, help="Rate: Days per carrier")
-    parser.add_argument("--r_gb", type=float, default=10.0, help="Rate: Days per GB")
+    parser.add_argument("--r_car", type=float, default=1.0, help="Rate: Carriers per day")
+    parser.add_argument("--r_gb", type=float, default=5.0, help="Rate: Days per GB")
 
     # Project Settings
     parser.add_argument("--staff", type=float, default=1.0, help="Number of archivists (FTE)")

@@ -9,9 +9,9 @@ Takes input on collection extents:
   - gigabytes of digital files
 
 Also take user input on process/accessiong rates (hardcoded but can be revised)
-  - days per linear foot (default: 1)
+  - linear foot per day (default: 1)
   - AMI processed/accessioned per day (default 30)
-  - digital carriers  (default: 5 days per carrier)
+  - digital carriers per day (default: 1)
   - gigabyes (default: 10 days per GB)
 
   - total staff working on project (can enter part time, e.g. 0.5)
@@ -20,7 +20,7 @@ Takes user input for timelines
   - days per week that project occurs, defaults to 5 days
   - start date (YYYY-MM-DD). Defaults to today 
 
-To run enter in command line: python3 ap_project_planner_ui.py 
+To run enter in commandline: python3 ap_project_planner_ui.py 
 
 """
 import datetime
@@ -140,7 +140,7 @@ def main_interactive():
         print("\n--- STEP 2: PROCESSING RATES ---")
         r_lin = get_numeric_input("Linear feet processed per day", 1.0) if lin > 0 else 1.0
         r_ami = get_numeric_input("AMI recordings processed per day", 30.0) if ami > 0 else 30.0
-        r_car = get_numeric_input("Days to process 1 digital carrier", 5.0) if car > 0 else 5.0
+        r_car = get_numeric_input("Digital carries per day", 1.0) if car > 0 else 1.0
         r_gb  = get_numeric_input("Days to process 1 Gigabyte", 10.0) if gb > 0 else 10.0
 
         # 3. Project Settings
@@ -154,7 +154,7 @@ def main_interactive():
         print("PLEASE REVIEW THE FOLLOWING:")
         if lin > 0: print(f" - Physical: {lin} ft at {r_lin} ft/day")
         if ami > 0: print(f" - AMI: {ami} recs at {r_ami} rec/day")
-        if car > 0: print(f" - Carriers: {car} at {r_car} days each")
+        if car > 0: print(f" - Carriers: {car} at {r_car} carrier/day")
         if gb  > 0: print(f" - Digital: {gb} GB at {r_gb} days/GB")
         
         day_names = ["Mon", "Tue", "Wed", "Thu", "Fri"]
@@ -198,7 +198,7 @@ def main_interactive():
     print("RATES USED FOR CALCULATION:")
     if lin > 0: print(f" - Physical: {r_lin} ft/day")
     if ami > 0: print(f" - AMI:      {r_ami} rec/day")
-    if car > 0: print(f" - Carriers: {r_car} days/carrier")
+    if car > 0: print(f" - Carriers: {r_car} carrier/day")
     if gb  > 0: print(f" - Digital:  {r_gb} days/GB")
     print("="*55 + "\n")
 
