@@ -12,7 +12,7 @@ Also take user input on process/accessiong rates (hardcoded but can be revised)
   - linear foot per day (default: 1)
   - AMI processed/accessioned per day (default 30)
   - digital carriers per day (default: 1)
-  - gigabyes (default: 10 days per GB)
+  - gigabyes per day (default: 0.2 per day, e.g. 5 days per GB)
 
   - total staff working on project (can enter part time, e.g. 0.5)
 
@@ -141,7 +141,7 @@ def main_interactive():
         r_lin = get_numeric_input("Linear feet processed per day", 1.0) if lin > 0 else 1.0
         r_ami = get_numeric_input("AMI recordings processed per day", 30.0) if ami > 0 else 30.0
         r_car = get_numeric_input("Digital carries per day", 1.0) if car > 0 else 1.0
-        r_gb  = get_numeric_input("Days to process 1 Gigabyte", 10.0) if gb > 0 else 10.0
+        r_gb  = get_numeric_input("Gigabytes per day", 0.2) if gb > 0 else 0.2 #equivelent to 5 days per GB
 
         # 3. Project Settings
         print("\n--- STEP 3: WORK DAYS AND STAFFING ---")
